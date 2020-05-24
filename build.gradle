@@ -22,11 +22,14 @@ dependencies {
 
     modCompile "net.fabricmc.fabric-api:fabric-api:${project.apiVersion}"
 
-    implementation "${project.jsr}"
-    include "${project.jsr}"
-
     implementation "${project.fastutil}"
     include "${project.fastutil}"
+
+    compile "${project.javassist}"
+    include "${project.javassist}"
+
+    implementation "${project.jsr}"
+    include "${project.jsr}"
 
     implementation "${project.reflections}"
     include "${project.reflections}"
