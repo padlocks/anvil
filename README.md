@@ -11,7 +11,7 @@ Also see [anvil events](https://github.com/transfarmer/anvilevents).
 ## usage
 ### including anvil in Gradle
 Click the JitPack banner above; replace `implementation` with `modImplementation`.<br>
-If you want to include this mod as a jar-in-jar depdendency, then also add this below `modImplementation`:
+If you want to include this mod as a jar-in-jar dependency, then also add this below `modImplementation`:
 ```groovy
 include "com.github.transfarmer:anvil:${VERSION}"
 ```
