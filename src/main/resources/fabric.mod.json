@@ -1,0 +1,31 @@
+{
+    "schemaVersion": 1,
+    "id": "anvil",
+    "version": "${version}",
+    "name": "Anvil",
+    "description": "an API that provides events and simple ways of making events and registering event listeners",
+    "authors": [
+        "transfarmer"
+    ],
+    "contact": {
+        "sources": "https://github.com/transfarmer/anvil"
+    },
+    "license": "GNU GPL v3.0",
+    "icon": "assets/anvil/logo.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "transfarmer.anvil.Main"
+        ]
+    },
+    "mixins": [
+    ],
+    "depends": {
+        "fabricloader": ">=0.8.4+build.198",
+        "fabric": "*",
+        "minecraft": "1.15.2"
+    },
+    "custom": {
+        "modmenu:api": "true"
+    }
+}
