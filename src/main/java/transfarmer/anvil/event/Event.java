@@ -6,10 +6,17 @@ import static net.minecraft.util.ActionResult.PASS;
 
 /**
  * the base class used for events.
- *
- * A {@link ActionResult#FAIL} {@link Event#result} should cancel further processing and return early.
  */
 public abstract class Event {
+    /**
+     * <p>
+     * {@link ActionResult#SUCCESS} should successfully adopt
+     * new behavior and cancel further processing.
+     * </p>
+     * <p>
+     * {@link ActionResult#FAIL} should cancel further processing and return early.
+     * </p>
+     */
     protected ActionResult result;
 
     public Event() {
