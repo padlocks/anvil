@@ -40,17 +40,14 @@ public class Main implements ModInitializer {
                         if (Modifier.isStatic(fieldModifiers) && Modifier.isPublic(fieldModifiers) && EventInvoker.class.isAssignableFrom(field.getType())) {
                             final Listener annotation = method.getAnnotation(Listener.class);
 
-                            try {
-                                ((EventInvoker<?>) field.get(null)).register(event -> {
-                                    try {
-                                        method.invoke(null, event);
-                                    } catch (final IllegalAccessException | InvocationTargetException exception) {
-                                        Main.LOGGER.error(exception);
-                                    }
-                                }, annotation.priority(), annotation.persist());
-                            } catch (final IllegalAccessException exception) {
-                                Main.LOGGER.error(exception);
-                            }
+                            //noinspection unchecked
+                            EventInvoker.register((Class<? extends Event>) clazz, event -> {
+                                try {
+                                    method.invoke(null, event);
+                                } catch (final IllegalAccessException | InvocationTargetException exception) {
+                                    Main.LOGGER.error(exception);
+                                }
+                            }, annotation.priority(), annotation.persist());
                         }
                     }
                 }

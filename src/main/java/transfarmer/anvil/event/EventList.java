@@ -6,21 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static transfarmer.anvil.event.EventPriority.FIVE;
-
 public class EventList<E extends Event> implements Iterable<EventListener<E>> {
     protected final List<EventListener<E>> delegate;
 
     public EventList() {
         this.delegate = new ArrayList<>();
-    }
-
-    public void add(final Class<E> clazz, final Consumer<E> consumer) {
-        this.add(clazz, consumer, FIVE);
-    }
-
-    public void add(final Class<E> clazz, final Consumer<E> consumer, final int priority) {
-        this.add(clazz, consumer, priority, false);
     }
 
     public void add(final Class<E> clazz, final Consumer<E> consumer, final int priority, final boolean persist) {
@@ -29,7 +19,7 @@ public class EventList<E extends Event> implements Iterable<EventListener<E>> {
         int index = 0;
 
         for (int i = 0, size = delegate.size(); i < size; i++) {
-            final EventListener<E> other = delegate.get(i);
+            final EventListener<? extends Event> other = delegate.get(i);
 
             if (other.equals(listener)) {
                 final int comparison = listener.compareTo(other);

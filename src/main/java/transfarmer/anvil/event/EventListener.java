@@ -3,22 +3,22 @@ package transfarmer.anvil.event;
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
-public class EventListener<E> implements Comparable<EventListener<E>> {
-    protected final Class<E> clazz;
+public class EventListener<E> implements Comparable<EventListener<? extends Event>> {
+    protected final Class<E> eventClass;
     protected final Consumer<E> consumer;
     protected final int priority;
     protected final boolean persistence;
 
     public EventListener(final Class<E> eventClass, final Consumer<E> consumer, final int priority,
                             final boolean persistence) {
-        this.clazz = eventClass;
+        this.eventClass = eventClass;
         this.consumer = consumer;
         this.priority = priority;
         this.persistence = persistence;
     }
 
     public Class<E> getEventClass() {
-        return this.clazz;
+        return this.eventClass;
     }
 
     public Consumer<E> getConsumer() {
@@ -39,11 +39,13 @@ public class EventListener<E> implements Comparable<EventListener<E>> {
     }
 
     @Override
-    public int compareTo(@Nonnull final EventListener<E> other) {
+    public int compareTo(@Nonnull final EventListener<? extends Event> other) {
         return this.priority - other.priority;
     }
 
-    public void accept(final E event) {
-        this.consumer.accept(event);
+    public <F extends Event> void accept(final F event) {
+        if (this.eventClass.isInstance(event)) {
+            this.consumer.accept((E) event);
+        }
     }
 }

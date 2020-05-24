@@ -1,41 +1,37 @@
 package transfarmer.anvil.event;
 
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static net.minecraft.util.ActionResult.FAIL;
 import static net.minecraft.util.ActionResult.SUCCESS;
 
-public class EventInvoker<E extends Event> {
-    protected final EventList<E> listeners;
-    protected final Class<E> listenerClass;
+public class EventInvoker {
+    protected static final Map<Class<? extends Event>, EventList<? extends Event>> LISTENERS = new Reference2ReferenceOpenHashMap<>();
 
-    public EventInvoker(final Class<E> listenerClass) {
-        this.listeners = new EventList<>();
-        this.listenerClass = listenerClass;
+    public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer) {
+        register(clazz, consumer, EventPriority.FIVE);
     }
 
-    protected EventList<E> getListeners() {
-        return this.listeners;
+    public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer, final int priority) {
+        register(clazz, consumer, priority, false);
     }
 
-    public void register(final Consumer<E> consumer) {
-        this.register(consumer, EventPriority.FIVE);
+    public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer, final boolean persistence) {
+        register(clazz, consumer, EventPriority.FIVE, persistence);
     }
 
-    public void register(final Consumer<E> consumer, final int priority) {
-        this.register(consumer, priority, false);
+    public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer, final int priority, final boolean persistence) {
+        final EventList<E> eventList = new EventList<>();
+
+        eventList.add(clazz, consumer, priority, persistence);
+        LISTENERS.put(clazz, eventList);
     }
 
-    public void register(final Consumer<E> consumer, final boolean persistence) {
-        this.register(consumer, EventPriority.FIVE, persistence);
-    }
-
-    public void register(final Consumer<E> consumer, final int priority, final boolean persistence) {
-        this.listeners.add(this.listenerClass, consumer, priority, persistence);
-    }
-
-    public E fire(final E event) {
-        for (final EventListener<E> listener : this.getListeners()) {
+    public static <E extends Event> E fire(final E event) {
+        for (final EventListener<? extends Event> listener : LISTENERS.get(event.getClass())) {
             if (event.getResult() != FAIL && event.getResult() != SUCCESS || listener.isPersistent()) {
                 listener.accept(event);
             }

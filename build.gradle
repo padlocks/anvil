@@ -25,6 +25,9 @@ dependencies {
     implementation "${project.jsr}"
     include "${project.jsr}"
 
+    implementation "${project.fastutil}"
+    include "${project.fastutil}"
+
     implementation "${project.reflections}"
     include "${project.reflections}"
 
