@@ -7,9 +7,9 @@ import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import transfarmer.anvil.event.Listener;
 import transfarmer.anvil.event.Event;
 import transfarmer.anvil.event.EventInvoker;
+import transfarmer.anvil.event.Listener;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

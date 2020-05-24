@@ -13,7 +13,7 @@ import transfarmer.anvil.event.Event;
 import transfarmer.anvil.event.EventInvoker;
 
 public class TestEvent extends Event {
-    public static final EventInvoker INVOKER = new EventInvoker<>(TestEvent.class)
+    public static final EventInvoker<TestEvent> INVOKER = new EventInvoker<>(TestEvent.class);
     
     protected boolean flag;
     
