@@ -16,20 +16,19 @@ public class EventList<E extends Event> implements Iterable<EventListener<E>> {
     public void add(final Class<E> clazz, final Consumer<E> consumer, final int priority, final boolean persist) {
         final EventListener<E> listener = new EventListener<>(clazz, consumer, priority, persist);
         final List<EventListener<E>> delegate = this.delegate;
-        int index = 0;
+        final int size = delegate.size();
+        int index = size;
 
-        for (int i = 0, size = delegate.size(); i < size; i++) {
+        for (int i = 0; i < size; i++) {
             final EventListener<? extends Event> other = delegate.get(i);
 
             if (other.equals(listener)) {
                 final int comparison = listener.compareTo(other);
 
-                if (comparison > 0) {
+                if (comparison <= 0) {
                     index = i + 1;
-                } else
+                } else {
                     index = i;
-
-                if (comparison < 0) {
                     break;
                 }
             }

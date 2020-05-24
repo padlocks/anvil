@@ -1,7 +1,6 @@
 package transfarmer.anvil.event;
 
 import net.minecraft.util.ActionResult;
-import transfarmer.anvil.event.EventPriority;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,14 +11,14 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Listener {
     /**
-     * @return a value indicating the priority of this event listener.
+     * @return an integer in the interval [0, 10] indicating the priority of this event listener.
      * Events with the greatest priorities are called first.
      */
-    int priority() default EventPriority.FIVE;
+    int priority() default 5;
 
     /**
-     * @return a Boolean value indicating whether this event listener
-     * should be called—even if the result is {@link ActionResult#FAIL}—or not.
+     * @return a Boolean value indicating whether this event listener should be called even if
+     * the {@link Event#result} is {@link ActionResult#FAIL} or {@link ActionResult#SUCCESS}.
      */
     boolean persist() default false;
 }

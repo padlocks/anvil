@@ -9,7 +9,7 @@ a Fabric API that implements a Forge-like priority-based event system. It featur
 Also see [Anvil events](https://github.com/transfarmer/anvilevents).
 
 ## usage
-### event definition
+### event definition and registration
 In order to define and register an event, simply extend Event:
 ```java
 import transfarmer.anvil.event.Event;
@@ -45,11 +45,13 @@ public class Callers {
 
 ### listening to events
 In order to listen to an event, annotate a `public static final` method with the `@Listener` annotation,
-which can optionally receive arguments for priority and persistence. 
+which can optionally receive arguments for priority (between and including 0 and 10) and persistence. 
 The method must have exactly one parameter: the event that is being listened to:
 ```java
+import transfarmer.anvil.event.EventPriority;
+
 public class Listeners {
-    @Listener(priority = EventPriority.SEVEN, persist = true)
+    @Listener(priority = 7, persist = true)
     public static void onTest(TestEvent event) {
         if (event.getFlag()) {
             event.setFlag(false);
