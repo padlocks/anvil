@@ -6,9 +6,17 @@
 
 a Fabric API that implements a Forge-like priority-based event system. It features simple creation of events and registration of event listeners and modification of event behavior via `ActionResult`s.
 
-Also see [Anvil events](https://github.com/transfarmer/anvilevents).
+Also see [anvil events](https://github.com/transfarmer/anvilevents).
 
 ## usage
+### including anvil in Gradle
+Click the JitPack banner above; replace `implementation` with `modImplementation`.<br>
+If you want to include this mod as a jar-in-jar depdendency, then also add this below `modImlpementation`:
+```groovy
+include "com.github.transfarmer:anvil:${VERSION}"
+```
+, where `${VERSION}` is your chosen version from above.
+
 ### event definition and registration
 In order to define and register an event, simply extend Event:
 ```java
