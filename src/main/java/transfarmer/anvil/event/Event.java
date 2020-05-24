@@ -10,8 +10,7 @@ import static net.minecraft.util.ActionResult.PASS;
 public abstract class Event {
     /**
      * <p>
-     * {@link ActionResult#SUCCESS} should successfully adopt
-     * new behavior and cancel further processing.
+     * {@link ActionResult#SUCCESS} should successfully adopt new behavior and cancel further processing.
      * </p>
      * <p>
      * {@link ActionResult#FAIL} should cancel further processing and return early.
