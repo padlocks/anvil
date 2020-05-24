@@ -5,6 +5,7 @@ plugins {
 
 apply plugin: "maven"
 apply from: "common.gradle"
+apply from: "project.gradle"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
