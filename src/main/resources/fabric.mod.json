@@ -1,8 +1,8 @@
 {
     "schemaVersion": 1,
     "id": "anvil",
-    "version": "${version}",
-    "name": "Anvil",
+    "version": "0.0.0",
+    "name": "anvil",
     "description": "an API that provides events and simple ways of making events and registering event listeners",
     "authors": [
         "transfarmer"
@@ -26,6 +26,6 @@
         "minecraft": "1.15.2"
     },
     "custom": {
-        "modmenu:api": "true"
+        "modmenu:api": true
     }
 }

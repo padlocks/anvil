@@ -4,12 +4,11 @@ plugins {
 }
 
 apply plugin: "maven"
+apply from: "common.gradle"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-archivesBaseName = project.archiveBaseName
-version = project.modVersion
 group = project.mavenGroup
 
 minecraft {
@@ -27,6 +26,8 @@ dependencies {
 
     implementation "${project.reflections}"
     include "${project.reflections}"
+
+    modImplementation "${project.modMenu}"
 }
 
 processResources {
