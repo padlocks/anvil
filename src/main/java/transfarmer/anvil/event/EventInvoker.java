@@ -11,18 +11,6 @@ import static net.minecraft.util.ActionResult.SUCCESS;
 public class EventInvoker {
     protected static final Map<Class<? extends Event>, EventList<? extends Event>> LISTENERS = new Reference2ReferenceOpenHashMap<>();
 
-    public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer) {
-        register(clazz, consumer, EventPriority.FIVE);
-    }
-
-    public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer, final int priority) {
-        register(clazz, consumer, priority, false);
-    }
-
-    public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer, final boolean persistence) {
-        register(clazz, consumer, EventPriority.FIVE, persistence);
-    }
-
     public static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer, final int priority, final boolean persistence) {
         final EventList<E> eventList = new EventList<>();
 

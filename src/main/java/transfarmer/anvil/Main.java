@@ -11,7 +11,6 @@ import transfarmer.anvil.event.Event;
 import transfarmer.anvil.event.EventInvoker;
 import transfarmer.anvil.event.Listener;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -34,22 +33,16 @@ public class Main implements ModInitializer {
                 final Class<?> clazz = method.getParameterTypes()[0];
 
                 if (Event.class.isAssignableFrom(clazz) && !Modifier.isAbstract(clazz.getModifiers())) {
-                    for (final Field field : clazz.getFields()) {
-                        final int fieldModifiers = field.getModifiers();
+                    final Listener annotation = method.getAnnotation(Listener.class);
 
-                        if (Modifier.isStatic(fieldModifiers) && Modifier.isPublic(fieldModifiers) && EventInvoker.class.isAssignableFrom(field.getType())) {
-                            final Listener annotation = method.getAnnotation(Listener.class);
-
-                            //noinspection unchecked
-                            EventInvoker.register((Class<? extends Event>) clazz, event -> {
-                                try {
-                                    method.invoke(null, event);
-                                } catch (final IllegalAccessException | InvocationTargetException exception) {
-                                    Main.LOGGER.error(exception);
-                                }
-                            }, annotation.priority(), annotation.persist());
+                    //noinspection unchecked
+                    EventInvoker.register((Class<? extends Event>) clazz, event -> {
+                        try {
+                            method.invoke(null, event);
+                        } catch (final IllegalAccessException | InvocationTargetException exception) {
+                            Main.LOGGER.error(exception);
                         }
-                    }
+                    }, annotation.priority(), annotation.persist());
                 }
             }
         }
