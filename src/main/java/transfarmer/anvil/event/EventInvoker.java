@@ -31,7 +31,9 @@ public class EventInvoker {
         final Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner(false), new MethodAnnotationsScanner()));
 
         for (final Class<? extends Event> clazz : reflections.getSubTypesOf(Event.class)) {
-            LISTENERS.put(clazz, new EventList<>());
+            if (!Modifier.isAbstract(clazz.getModifiers())) {
+                LISTENERS.put(clazz, new EventList<>());
+            }
         }
 
         for (final Method method : reflections.getMethodsAnnotatedWith(Listener.class)) {
@@ -40,17 +42,28 @@ public class EventInvoker {
             if (Modifier.isStatic(methodModifiers) && Modifier.isPublic(methodModifiers) && method.getReturnType() == void.class && method.getParameterCount() == 1) {
                 final Class<?> parameterType = method.getParameterTypes()[0];
 
-                if (Event.class.isAssignableFrom(parameterType) && !Modifier.isAbstract(parameterType.getModifiers())) {
+                if (Event.class.isAssignableFrom(parameterType)) {
                     final Listener annotation = method.getAnnotation(Listener.class);
-
                     //noinspection unchecked
-                    register((Class<? extends Event>) parameterType, event -> {
+                    final Class<? extends Event> eventClass = (Class<? extends Event>) parameterType;
+
+                    register(eventClass, event -> {
                         try {
                             method.invoke(null, event);
                         } catch (final IllegalAccessException | InvocationTargetException exception) {
-                            Main.LOGGER.error(exception);
+                            Main.LOGGER.trace(exception);
                         }
                     }, annotation.priority(), annotation.persist());
+
+                    for (final Class<? extends Event> subclass : reflections.getSubTypesOf(eventClass)) {
+                        register(subclass, event -> {
+                            try {
+                                method.invoke(null, event);
+                            } catch (final IllegalAccessException | InvocationTargetException exception) {
+                                Main.LOGGER.trace(exception);
+                            }
+                        }, annotation.priority(), annotation.persist());
+                    }
                 }
             }
         }
