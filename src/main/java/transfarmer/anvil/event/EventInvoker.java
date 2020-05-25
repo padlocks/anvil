@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import transfarmer.anvil.Main;
@@ -11,7 +12,9 @@ import transfarmer.anvil.Main;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static net.minecraft.util.ActionResult.FAIL;
@@ -28,45 +31,46 @@ public class EventInvoker {
 
         Main.LOGGER.info("Registering event listeners.");
 
-        final Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner(false), new MethodAnnotationsScanner()));
+        final Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner(false), new TypeAnnotationsScanner(), new MethodAnnotationsScanner()));
 
-        for (final Class<? extends Event> clazz : reflections.getSubTypesOf(Event.class)) {
+        for (final Class<? extends Event> clazz : getClassAndSubclasses(reflections, Event.class)) {
             LISTENERS.put(clazz, new EventList<>());
         }
 
-        for (final Method method : reflections.getMethodsAnnotatedWith(Listener.class)) {
-            final int methodModifiers = method.getModifiers();
+        for (final Class<?> clazz : reflections.getTypesAnnotatedWith(Anvil.class)) {
+            for (final Method method : clazz.getDeclaredMethods()) {
+                final int methodModifiers = method.getModifiers();
 
-            if (Modifier.isStatic(methodModifiers) && Modifier.isPublic(methodModifiers) && method.getReturnType() == void.class && method.getParameterCount() == 1) {
-                final Class<?> parameterType = method.getParameterTypes()[0];
+                if (Modifier.isPublic(methodModifiers) && method.getReturnType() == void.class && Modifier.isStatic(methodModifiers) && method.getParameterCount() == 1) {
+                    try {
+                        final Listener annotation = method.getAnnotation(Listener.class);
 
-                if (Event.class.isAssignableFrom(parameterType)) {
-                    final Listener annotation = method.getAnnotation(Listener.class);
-                    //noinspection unchecked
-                    final Class<? extends Event> eventClass = (Class<? extends Event>) parameterType;
-
-                    register(eventClass, event -> {
-                        try {
-                            method.invoke(null, event);
-                        } catch (final IllegalAccessException | InvocationTargetException exception) {
-                            Main.LOGGER.trace(exception);
+                        //noinspection unchecked
+                        for (final Class<? extends Event> subclass : getClassAndSubclasses(reflections, (Class<? extends Event>) method.getParameterTypes()[0])) {
+                            register(subclass, event -> {
+                                try {
+                                    method.invoke(null, event);
+                                } catch (final IllegalAccessException | InvocationTargetException exception) {
+                                    Main.LOGGER.trace(exception);
+                                }
+                            }, annotation.priority(), annotation.persist());
                         }
-                    }, annotation.priority(), annotation.persist());
-
-                    for (final Class<? extends Event> subclass : reflections.getSubTypesOf(eventClass)) {
-                        register(subclass, event -> {
-                            try {
-                                method.invoke(null, event);
-                            } catch (final IllegalAccessException | InvocationTargetException exception) {
-                                Main.LOGGER.trace(exception);
-                            }
-                        }, annotation.priority(), annotation.persist());
+                    } catch (final ClassCastException ignored) {
                     }
                 }
             }
         }
 
-        Main.LOGGER.info("Done after {} milliseconds.", (System.nanoTime() - start) / 1000000);
+        Main.LOGGER.info("Done after {} ms.", (System.nanoTime() - start) / 1000000);
+    }
+
+    protected static <T> Set<Class<? extends T>> getClassAndSubclasses(final Reflections reflections, final Class<T> clazz) {
+        final Set<Class<? extends T>> classes = new HashSet<>();
+
+        classes.add(clazz);
+        classes.addAll(reflections.getSubTypesOf(clazz));
+
+        return classes;
     }
 
     protected static <E extends Event> void register(final Class<E> clazz, final Consumer<E> consumer,

@@ -8,7 +8,7 @@ a Fabric API that implements a Forge-like priority-based event system. It featur
 
 Also see [anvil events](https://github.com/transfarmer/anvilevents).
 
-## usage
+##
 ### including anvil in Gradle
 Click the JitPack banner above; replace `implementation` with `modImplementation`.<br>
 If you want to include this mod as a jar-in-jar dependency, then also add this below `modImplementation`:
@@ -18,7 +18,7 @@ include "com.github.transfarmer:anvil:${VERSION}"
 , where `${VERSION}` is your chosen version from above. Use `1.15.2-SNAPSHOT` for the latest commit.
 
 ### event definition and registration
-In order to define and register an event, simply extend Event:
+In order to define and register an event, simply extend `Event`:
 ```java
 import transfarmer.anvil.event.Event;
 
@@ -51,9 +51,22 @@ public class Callers {
 }
 ```
 
-### listening to events
+## listening to events
+Classes containing event listeners should be marked with the `@Anvil` annotation:
+```java
+import transfarmer.anvil.event.Anvil;
+
+@Anvil
+public class Listeners {
+    // ...
+}
+```
+
 In order to listen to an event, annotate a `public static final` method with the `@Listener` annotation,
-which can optionally receive arguments for priority (between and including 0 and 10) and persistence. 
+which can optionally receive arguments for priority (between and including 0 and 10; default: 5)
+and persistence (default: `false`), which indicates that the event listener should receive events
+even with `FAIL` or `SUCCESS` action result.
+
 The method must have exactly one parameter: the event that is being listened to:
 ```java
 import transfarmer.anvil.event.EventPriority;
@@ -62,7 +75,6 @@ public class Listeners {
     @Listener(priority = 7, persist = true)
     public static void onTest(TestEvent event) {
         if (event.getFlag()) {
-            event.setFlag(false);
             event.setResult(ActionResult.FAIL);
         }
     }
