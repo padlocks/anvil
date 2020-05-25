@@ -31,9 +31,7 @@ public class EventInvoker {
         final Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forClassLoader()).setScanners(new SubTypesScanner(false), new MethodAnnotationsScanner()));
 
         for (final Class<? extends Event> clazz : reflections.getSubTypesOf(Event.class)) {
-            if (!Modifier.isAbstract(clazz.getModifiers())) {
-                LISTENERS.put(clazz, new EventList<>());
-            }
+            LISTENERS.put(clazz, new EventList<>());
         }
 
         for (final Method method : reflections.getMethodsAnnotatedWith(Listener.class)) {
