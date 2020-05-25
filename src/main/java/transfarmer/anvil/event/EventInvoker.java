@@ -19,6 +19,8 @@ import static net.minecraft.util.ActionResult.SUCCESS;
 public class EventInvoker {
     protected static final Map<Class<? extends Event>, EventList<? extends Event>> LISTENERS = new Reference2ReferenceOpenHashMap<>();
 
+    public static void load() {}
+
     static {
         final long start = System.nanoTime();
 

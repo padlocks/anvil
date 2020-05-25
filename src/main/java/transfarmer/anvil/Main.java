@@ -3,6 +3,7 @@ package transfarmer.anvil;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import transfarmer.anvil.event.EventInvoker;
 
 public class Main implements ModInitializer {
     public static final String MOD_ID = "anvil";
@@ -11,5 +12,6 @@ public class Main implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        EventInvoker.load();
     }
 }
