@@ -25,24 +25,14 @@ public abstract class Event {
         return this.result;
     }
 
-    public void setResult(final ActionResult result) {
-        this.result = result;
+    public void setAccepted() {
+        if (!this.isAccepted()) {
+            this.setConsume();
+        }
     }
 
-    public void setFail() {
-        this.result = FAIL;
-    }
-
-    public void setPass() {
-        this.result = PASS;
-    }
-
-    public void setConsume() {
-        this.result = CONSUME;
-    }
-
-    public void setSuccess() {
-        this.result = SUCCESS;
+    public boolean isAccepted() {
+        return this.result.isAccepted();
     }
 
     public boolean isFail() {
@@ -61,7 +51,23 @@ public abstract class Event {
         return this.result == SUCCESS;
     }
 
-    public boolean isAccepted() {
-        return this.result.isAccepted();
+    public void setFail() {
+        this.result = FAIL;
+    }
+
+    public void setPass() {
+        this.result = PASS;
+    }
+
+    public void setConsume() {
+        this.result = CONSUME;
+    }
+
+    public void setSuccess() {
+        this.result = SUCCESS;
+    }
+
+    public void setResult(final ActionResult result) {
+        this.result = result;
     }
 }
