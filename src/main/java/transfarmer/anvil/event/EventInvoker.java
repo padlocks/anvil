@@ -1,6 +1,14 @@
 package transfarmer.anvil.event;
 
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
@@ -9,24 +17,14 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import transfarmer.anvil.Main;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import static net.minecraft.util.ActionResult.FAIL;
 import static net.minecraft.util.ActionResult.SUCCESS;
 
-public class EventInvoker {
+public class EventInvoker implements PreLaunchEntrypoint {
     protected static final Map<Class<? extends Event>, EventList<? extends Event>> LISTENERS = new Reference2ReferenceOpenHashMap<>();
 
-    public static void load() {
-    }
-
-    static {
+    @Override
+    public void onPreLaunch() {
         final long start = System.nanoTime();
 
         Main.LOGGER.info("Registering event listeners.");

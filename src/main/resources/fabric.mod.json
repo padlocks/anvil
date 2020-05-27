@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "anvil",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "name": "anvil",
     "description": "an API that provides events and simple ways of making events and registering event listeners",
     "authors": [
@@ -16,6 +16,9 @@
     "entrypoints": {
         "main": [
             "transfarmer.anvil.Main"
+        ],
+        "preLaunch": [
+            "transfarmer.anvil.event.EventInvoker"
         ]
     },
     "mixins": [
