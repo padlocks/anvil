@@ -44,4 +44,20 @@ public abstract class Event {
     public void setSuccess() {
         this.result = SUCCESS;
     }
+
+    public boolean isFail() {
+        return this.result == FAIL;
+    }
+
+    public boolean isPass() {
+        return this.result == PASS;
+    }
+
+    public boolean isConsume() {
+        return this.result == CONSUME;
+    }
+
+    public boolean isSuccess() {
+        return this.result == SUCCESS;
+    }
 }
