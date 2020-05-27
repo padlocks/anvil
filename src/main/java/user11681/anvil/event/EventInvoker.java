@@ -1,4 +1,4 @@
-package transfarmer.anvil.event;
+package user11681.anvil.event;
 
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +15,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import transfarmer.anvil.Main;
+import user11681.anvil.Main;
 
 import static net.minecraft.util.ActionResult.FAIL;
 import static net.minecraft.util.ActionResult.SUCCESS;
