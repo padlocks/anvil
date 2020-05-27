@@ -10,7 +10,7 @@ import static net.minecraft.util.ActionResult.SUCCESS;
 /**
  * the base class used for events.
  */
-public abstract class Event<T> {
+public abstract class Event {
     /**
      * {@link ActionResult#SUCCESS} should successfully adopt new behavior and cancel further processing.
      * {@link ActionResult#FAIL} should cancel further processing and use default values.
@@ -23,10 +23,6 @@ public abstract class Event<T> {
 
     public ActionResult getResult() {
         return this.result;
-    }
-
-    public Event<T> fire() {
-        return EventInvoker.fire(this);
     }
 
     public void setResult(final ActionResult result) {
