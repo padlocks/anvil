@@ -13,14 +13,12 @@ import static net.minecraft.util.ActionResult.SUCCESS;
 public abstract class Event {
     /**
      * {@link ActionResult#SUCCESS} should successfully adopt new behavior and cancel further processing.
-     * {@link ActionResult#FAIL} should cancel further processing and use default values.
+     * {@link ActionResult#FAIL} should cancel further processing and fall back to default behavior.
      */
     protected ActionResult result;
 
     public Event() {
         this.result = PASS;
-
-        EventInvoker.fire(this);
     }
 
     public ActionResult getResult() {
