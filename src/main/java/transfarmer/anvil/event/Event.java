@@ -19,6 +19,8 @@ public abstract class Event {
 
     public Event() {
         this.result = PASS;
+
+        EventInvoker.fire(this);
     }
 
     public ActionResult getResult() {
