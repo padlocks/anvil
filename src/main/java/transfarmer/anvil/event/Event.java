@@ -60,4 +60,8 @@ public abstract class Event {
     public boolean isSuccess() {
         return this.result == SUCCESS;
     }
+
+    public boolean isAccepted() {
+        return this.result.isAccepted();
+    }
 }
