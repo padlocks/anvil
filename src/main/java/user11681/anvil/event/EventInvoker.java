@@ -40,20 +40,20 @@ public class EventInvoker implements PreLaunchEntrypoint {
                 final int methodModifiers = method.getModifiers();
 
                 if (Modifier.isPublic(methodModifiers) && method.getReturnType() == void.class && Modifier.isStatic(methodModifiers) && method.getParameterCount() == 1) {
-                    try {
-                        final Listener annotation = method.getAnnotation(Listener.class);
+                    final Listener annotation = method.getAnnotation(Listener.class);
+                    final Class<?> parameterType = method.getParameterTypes()[0];
 
+                    if (Event.class.isAssignableFrom(parameterType)) {
                         //noinspection unchecked
-                        for (final Class<? extends Event> subclass : getClassAndSubclasses(reflections, (Class<? extends Event>) method.getParameterTypes()[0])) {
+                        for (final Class<? extends Event> subclass : getClassAndSubclasses(reflections, (Class<? extends Event>) parameterType)) {
                             register(subclass, event -> {
                                 try {
                                     method.invoke(null, event);
                                 } catch (final IllegalAccessException | InvocationTargetException exception) {
-                                    Main.LOGGER.trace(exception);
+                                    Main.LOGGER.error(exception);
                                 }
                             }, annotation.priority(), annotation.persist());
                         }
-                    } catch (final ClassCastException ignored) {
                     }
                 }
             }
