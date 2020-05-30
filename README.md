@@ -41,7 +41,7 @@ public class TestEvent extends Event {
 ```
 
 ### event registration
-To register an event, specify an entrypoint class that implements one of 
+To register an event, define an entrypoint class that implements one of 
 `CommonEventInitializer`, `ClientEventInitializer` and `ServerEventInitializer`
 and overrides `get()`, which should return a `Collection` of the classes of the events to be registered:
 ```java
