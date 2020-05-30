@@ -74,6 +74,7 @@ and include it in your Fabric JSON file:
     }
 }
 ```
+Registering an event causes all of its superclasses except `Object` to be registered if not already registered.
 
 ### firing events
 In order to fire an event, invoke `EventInvoker#fire(Event)`:
@@ -142,4 +143,4 @@ public class Listeners {
     }
 }
 ```
-.
+. The event listener will receive all events of its parameter's type and its subclasses.
