@@ -91,6 +91,7 @@ public class EventInvoker implements PreLaunchEntrypoint {
         switch (loader.getEnvironmentType()) {
             case CLIENT:
                 entrypoints.addAll(loader.getEntrypoints("anvilClientListeners", ClientListenerInitializer.class));
+                break;
             case SERVER:
                 entrypoints.addAll(loader.getEntrypoints("anvilServerListeners", ServerListenerInitializer.class));
         }
