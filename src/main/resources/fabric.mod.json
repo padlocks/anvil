@@ -11,7 +11,7 @@
         "sources": "https://github.com/user11681/anvil"
     },
     "license": "GNU GPL v3.0",
-    "icon": "assets/anvil/logo.png",
+    "icon": "assets/anvil/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
