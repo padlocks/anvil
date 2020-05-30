@@ -41,14 +41,15 @@ public class TestEvent extends Event {
 ```
 
 ### event registration
-To register an event, specify an entrypoint class that `implements EventInitializer`
-and implement `get()`, which should return a `Collection` of the classes of the events to be registered:
+To register an event, specify an entrypoint class that implements one of 
+`CommonEventInitializer`, `ClientEventInitializer` and `ServerEventInitializer`
+and overrides `get()`, which should return a `Collection` of the classes of the events to be registered:
 ```java
 package com.examplemod;
 
-import transfarmer.anvil.entrypoint.EventInitializer;
+import transfarmer.anvil.entrypoint.CommonEventInitializer;
 
-public class ExampleModEventInitializer implements EventInitializer {
+public class ExampleModEventInitializer implements CommonEventInitializer {
     public Collection<Class<? extends Event>> get() {
         return Arrays.asList(TestEvent.class);
     }   
@@ -59,10 +60,16 @@ and include it in your Fabric JSON file:
 {
     "entrypoints": {
         "main": [
-            // ...
+            ". . ."
         ],
-        "anvilEvents": [
+        "anvilCommonEvents": [
             "com.examplemod.ExampleModEventInitializer"
+        ],
+        "anvilClientEvents": [
+            ". . ."
+        ],
+        "anvilServerEvents": [
+            ". . ."
         ]
     }
 }
@@ -81,36 +88,44 @@ public class EventHooks {
 ```
 
 ### registering listener classes
-Classes containing event listeners should be specified in an entrypoint class that `implements ListenerInitializer`
-and overrides the `get()` method:
+Classes containing event listener methods should be specified in an entrypoint class that implements one of
+`CommonListenerInitializer`, `ClientListenerInitializer` and `ServerListenerInitializer`
+and overrides the `get()` method, which should return the listener classes to be registered:
 ```java
 package com.examplemod;
 
-import transfarmer.anvil.entrypoint.ListenerInitializer;
+import transfarmer.anvil.entrypoint.CommonListenerInitializer;
 
-public class ExampleModListenerInitializer implements ListenerInitializer {
+public class ExampleModListenerInitializer implements CommonListenerInitializer {
     public Collection<Class<?>> get() {
         return Arrays.asList(Listeners.class);
     }   
 }
 ```
-. Further, the entrypoint class should be specified in your mod JSON file:
+. Further, the entrypoint should be specified in your mod JSON file:
 ```json
 {
     "entrypoints": {
         "main": [
-            // ...
+            ". . ."
         ],
-        "anvilListeners": [
+        "anvilCommonListeners": [
             "com.examplemod.ExampleModListenerInitializer"
-        ]
+        ],
+        "anvilClientListeners": [
+            ". . ."
+        ],
+        "anvilServerListeners": [
+            ". . ."
+        ]           
     }
 }
 ```
 
 ### defining event listeners
 Event listener methods must be `public static final` and marked with the `@Listener` annotation,
-which can optionally receive arguments for priority (between and including 0 and 100; default: 50)
+which can optionally receive arguments for priority
+(between and including 0 and 100; default: 50; listeners with the greatest `priority` value are called first)
 and persistence (default: `false`), which indicates that the event listener should receive events
 even with `FAIL` or `SUCCESS` result. Listener classes are searched for event listeners automatically.
 
