@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/transfarmer/anvil/1.15.2/src/main/resources/assets/anvil/logo.png" width="20%"></img>
+<img src="https://raw.githubusercontent.com/user11681/anvil/1.15.2/src/main/resources/assets/anvil/icon.png" width="20%"></img>
 
 # anvil
 
@@ -10,7 +10,7 @@ and supports changing method context and modification of event behavior via `Act
 Also see [anvil events](https://github.com/transfarmer/anvilevents).
 
 ##
-### including anvil in Gradle
+### including anvil with Gradle
 Click the JitPack banner above; replace `implementation` with `modImplementation`.<br>
 If you want to include this mod as a jar-in-jar dependency, then also add this below `modImplementation`:
 ```groovy
