@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class EventList<E extends Event> implements Iterable<EventListener<E>> {
+public class ListenerList<E extends Event> implements Iterable<EventListener<E>> {
     protected final List<EventListener<E>> delegate;
 
-    public EventList() {
+    public ListenerList() {
         this.delegate = new ArrayList<>();
     }
 

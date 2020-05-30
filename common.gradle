@@ -1,7 +1,7 @@
 apply plugin: "maven"
 apply from: "project.gradle"
 
-group = "transfarmer"
+group = "user11681"
 
 repositories {
     maven {

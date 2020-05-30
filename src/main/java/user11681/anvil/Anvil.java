@@ -1,15 +1,18 @@
-package user11681.anvil.event;
+package user11681.anvil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
-import user11681.anvil.Main;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import user11681.anvil.entrypoint.ClientEventInitializer;
 import user11681.anvil.entrypoint.ClientListenerInitializer;
 import user11681.anvil.entrypoint.CommonEventInitializer;
@@ -18,26 +21,37 @@ import user11681.anvil.entrypoint.EventInitializer;
 import user11681.anvil.entrypoint.ListenerInitializer;
 import user11681.anvil.entrypoint.ServerEventInitializer;
 import user11681.anvil.entrypoint.ServerListenerInitializer;
+import user11681.anvil.event.Event;
+import user11681.anvil.event.EventListener;
+import user11681.anvil.event.Listener;
+import user11681.anvil.event.ListenerList;
 
-import static net.minecraft.util.ActionResult.FAIL;
-import static net.minecraft.util.ActionResult.SUCCESS;
+public class Anvil implements PreLaunchEntrypoint {
+    public static final String MOD_ID = "anvil";
 
-public class EventInvoker implements PreLaunchEntrypoint {
-    protected static final Map<Class<? extends Event>, EventList<? extends Event>> LISTENERS = new HashMap<>();
-    protected static final Map<Class<? extends Event>, List<Class<? extends Event>>> SUBEVENTS = new HashMap<>();
+    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+
+    protected static final Map<Class<? extends Event>, ListenerList<? extends Event>> EVENTS = new HashMap<>();
+    protected static final Map<Class<? extends Event>, Set<Class<? extends Event>>> SUBEVENTS = new HashMap<>();
+    protected static int implementations;
+    protected static int listeners;
 
     @Override
     public void onPreLaunch() {
         long time = System.nanoTime();
+        registerEvents();
+        long duration = (System.nanoTime() - time) / 1000;
 
-        Main.LOGGER.info("Registered {} event classes in {} μs.", registerEvents(), (System.nanoTime() - time) / 1000);
+        LOGGER.info("Registered {} event classes ({} abstract and {} implementations) in {} μs.", getTotalEvents(), getAbstractEvents(), getEventImplementations(), duration);
 
         time = System.nanoTime();
+        registerListeners();
+        duration = (System.nanoTime() - time) / 1000;
 
-        Main.LOGGER.info("Registered {} event listeners in {} μs.", registerListeners(), (System.nanoTime() - time) / 1000);
+        LOGGER.info("Registered {} event listeners in {} μs.", getTotalListeners(), duration);
     }
 
-    protected static int registerEvents() {
+    protected static void registerEvents() {
         final FabricLoader loader = FabricLoader.getInstance();
         final List<EventInitializer> entrypoints = new ArrayList<>(loader.getEntrypoints("anvilCommonEvents", CommonEventInitializer.class));
 
@@ -54,37 +68,43 @@ public class EventInvoker implements PreLaunchEntrypoint {
                 registerBranch(clazz);
             }
         }
-
-        return LISTENERS.size();
     }
 
-    protected static void registerBranch(final Class<? extends Event> clazz) {
-        final Class<?> superclass = clazz.getSuperclass();
-
-        if (Event.class.isAssignableFrom(superclass)) {
+    protected static <T extends Event> void registerBranch(final Class<T> clazz) {
+        if (Event.class.isAssignableFrom(clazz.getSuperclass())) {
             //noinspection unchecked
-            registerBranch((Class<? extends Event>) superclass);
+            final Class<T> superclass = (Class<T>) clazz.getSuperclass();
 
-            final List<Class<? extends Event>> subevents;
+            registerBranch(superclass);
+            registerSuperevents(clazz, superclass);
+        }
 
-            if (SUBEVENTS.containsKey(superclass)) {
-                subevents = SUBEVENTS.get(superclass);
-            } else {
-                subevents = new ArrayList<>();
-                SUBEVENTS.put(clazz, subevents);
-            }
+        if (!SUBEVENTS.containsKey(clazz)) {
+            final Set<Class<? extends Event>> subevents = new HashSet<>();
 
-            if (!subevents.contains(clazz)) {
-                subevents.add(clazz);
+            subevents.add(clazz);
+
+            SUBEVENTS.put(clazz, subevents);
+
+            if (!Modifier.isAbstract(clazz.getModifiers())) {
+                ++implementations;
             }
         }
 
-        if (!LISTENERS.containsKey(clazz)) {
-            LISTENERS.put(clazz, new EventList<>());
+        if (!EVENTS.containsKey(clazz)) {
+            EVENTS.put(clazz, new ListenerList<>());
         }
     }
 
-    protected static int registerListeners() {
+    protected static <T extends Event> void registerSuperevents(final Class<T> clazz, final Class<? super T> superclass) {
+        if (Event.class.isAssignableFrom(superclass)) {
+            SUBEVENTS.get(superclass).add(clazz);
+
+            registerSuperevents(clazz, superclass.getSuperclass());
+        }
+    }
+
+    protected static void registerListeners() {
         final FabricLoader loader = FabricLoader.getInstance();
         final List<ListenerInitializer> entrypoints = new ArrayList<>(loader.getEntrypoints("anvilCommonListeners", CommonListenerInitializer.class));
 
@@ -109,20 +129,13 @@ public class EventInvoker implements PreLaunchEntrypoint {
 
                             if (Event.class.isAssignableFrom(parameterType)) {
                                 registerListener(parameterType, method, annotation);
+                                ++listeners;
                             }
                         }
                     }
                 }
             }
         }
-
-        int registered = 0;
-
-        for (final EventList<?> listeners : LISTENERS.values()) {
-            registered += listeners.size();
-        }
-
-        return registered;
     }
 
     protected static <E extends Event> void registerListener(final Class<?> parameterType, final Method method, final Listener annotation) {
@@ -130,25 +143,41 @@ public class EventInvoker implements PreLaunchEntrypoint {
             final int priority = annotation.priority();
 
             if (priority < 0) {
-                throw new IllegalArgumentException("Event priority may not be less than 0.");
+                throw new IllegalArgumentException(String.format("%s priority < 0", method));
             } else if (priority > 100) {
-                throw new IllegalArgumentException("Event priority may not be greater than 100.");
+                throw new IllegalArgumentException(String.format("%s priority > 100", method));
             }
 
             //noinspection unchecked
-            ((EventList<E>) LISTENERS.get(eventClass)).add((Class<E>) eventClass, event -> {
+            ((ListenerList<E>) EVENTS.get(eventClass)).add((Class<E>) eventClass, event -> {
                 try {
                     method.invoke(null, event);
-                } catch (final IllegalAccessException | InvocationTargetException exception) {
-                    Main.LOGGER.error(exception);
+                } catch (final InvocationTargetException | IllegalAccessException exception) {
+                    LOGGER.error("An error occurred while attempting to fire an event: ", exception.getCause());
                 }
             }, priority, annotation.persist());
         }
     }
 
+    public static int getAbstractEvents() {
+        return getTotalEvents() - getEventImplementations();
+    }
+
+    public static int getEventImplementations() {
+        return implementations;
+    }
+
+    public static int getTotalEvents() {
+        return EVENTS.size();
+    }
+
+    public static int getTotalListeners() {
+        return listeners;
+    }
+
     public static <E extends Event> E fire(final E event) {
-        for (final EventListener<? extends Event> listener : LISTENERS.get(event.getClass())) {
-            if (event.getResult() != FAIL && event.getResult() != SUCCESS || listener.isPersistent()) {
+        for (final EventListener<? extends Event> listener : EVENTS.get(event.getClass())) {
+            if (event.shouldContinue() || listener.isPersistent()) {
                 listener.accept(event);
             }
         }

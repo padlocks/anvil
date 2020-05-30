@@ -14,11 +14,8 @@
     "icon": "assets/anvil/icon.png",
     "environment": "*",
     "entrypoints": {
-        "main": [
-            "user11681.anvil.Main"
-        ],
         "preLaunch": [
-            "user11681.anvil.event.EventInvoker"
+            "user11681.anvil.Anvil"
         ]
     },
     "mixins": [

@@ -35,6 +35,10 @@ public abstract class Event {
         return this.result.isAccepted();
     }
 
+    public boolean shouldContinue() {
+        return !this.isFail() && !this.isSuccess();
+    }
+
     public boolean isFail() {
         return this.result == FAIL;
     }
