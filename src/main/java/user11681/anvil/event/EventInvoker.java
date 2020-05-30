@@ -1,10 +1,10 @@
 package user11681.anvil.event;
 
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.fabricmc.loader.api.FabricLoader;
@@ -17,8 +17,8 @@ import static net.minecraft.util.ActionResult.FAIL;
 import static net.minecraft.util.ActionResult.SUCCESS;
 
 public class EventInvoker implements PreLaunchEntrypoint {
-    protected static final Map<Class<? extends Event>, EventList<? extends Event>> LISTENERS = new Reference2ReferenceOpenHashMap<>();
-    protected static final Map<Class<? extends Event>, List<Class<? extends Event>>> SUBEVENTS = new Reference2ReferenceOpenHashMap<>();
+    protected static final Map<Class<? extends Event>, EventList<? extends Event>> LISTENERS = new HashMap<>();
+    protected static final Map<Class<? extends Event>, List<Class<? extends Event>>> SUBEVENTS = new HashMap<>();
 
     @Override
     public void onPreLaunch() {
@@ -55,7 +55,7 @@ public class EventInvoker implements PreLaunchEntrypoint {
             if (SUBEVENTS.containsKey(superclass)) {
                 subevents = SUBEVENTS.get(superclass);
             } else {
-                subevents = new ReferenceArrayList<>();
+                subevents = new ArrayList<>();
                 SUBEVENTS.put(clazz, subevents);
             }
 

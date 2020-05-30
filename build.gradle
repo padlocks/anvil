@@ -3,9 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-apply plugin: "maven"
 apply from: "common.gradle"
-apply from: "project.gradle"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -18,12 +16,9 @@ minecraft {
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraftVersion}"
     mappings "net.fabricmc:yarn:${project.yarnMappings}:v2"
-    modCompile "net.fabricmc:fabric-loader:${project.loaderVersion}"
+    modImplementation "net.fabricmc:fabric-loader:${project.loaderVersion}"
 
-    modCompile "net.fabricmc.fabric-api:fabric-api:${project.apiVersion}"
-
-    implementation "${project.fastutil}"
-    include "${project.fastutil}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.apiVersion}"
 
     implementation "${project.jsr}"
     include "${project.jsr}"
