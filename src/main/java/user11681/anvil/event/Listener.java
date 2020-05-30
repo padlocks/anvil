@@ -14,7 +14,7 @@ public @interface Listener {
      * @return an integer in the interval [0, 10] indicating the priority of this event listener.
      * Events with the greatest priorities are called first.
      */
-    int priority() default 5;
+    int priority() default 50;
 
     /**
      * @return a Boolean value indicating whether this event listener should be called even if

@@ -42,4 +42,8 @@ public class EventList<E extends Event> implements Iterable<EventListener<E>> {
     public Iterator<EventListener<E>> iterator() {
         return this.delegate.iterator();
     }
+
+    public int size() {
+        return this.delegate.size();
+    }
 }

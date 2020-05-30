@@ -25,14 +25,8 @@ dependencies {
     implementation "${project.fastutil}"
     include "${project.fastutil}"
 
-    implementation "${project.javassist}"
-    include "${project.javassist}"
-
     implementation "${project.jsr}"
     include "${project.jsr}"
-
-    implementation "${project.reflections}"
-    include "${project.reflections}"
 
     modImplementation "${project.modMenu}"
 }

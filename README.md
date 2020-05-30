@@ -4,8 +4,7 @@
 
 [![](https://jitpack.io/v/transfarmer/anvil.svg)](https://jitpack.io/#transfarmer/anvil)
 
-an annotation-based event system for Fabric.
-It features simple creation of events and registration of event listeners
+an event system for Fabric that features simple creation of events and registration of event listeners
 and supports changing method context and modification of event behavior via `ActionResult`s.
 
 Also see [anvil events](https://github.com/transfarmer/anvilevents).
@@ -19,8 +18,8 @@ include "com.github.transfarmer:anvil:${VERSION}"
 ```
 , where `${VERSION}` is your chosen version from above. Use `1.15.2-SNAPSHOT` for the latest commit.
 
-### event definition and registration
-In order to define and register an event, simply extend `Event`:
+### event definition
+In order to define an event, extend the `Event` class:
 ```java
 import transfarmer.anvil.event.Event;
 
@@ -41,43 +40,87 @@ public class TestEvent extends Event {
 }
 ```
 
+### event registration
+To register an event, specify an entrypoint class that `implements EventInitializer`
+and implement `get()`, which should return a `Collection` of the classes of the events to be registered:
+```java
+package com.examplemod;
+
+import transfarmer.anvil.entrypoint.EventInitializer;
+
+public class ExampleModEventInitializer implements EventInitializer {
+    public Collection<Class<? extends Event>> get() {
+        return Arrays.asList(TestEvent.class);
+    }   
+}
+```
+and include it in your Fabric JSON file:
+```json
+{
+    "main": [
+        // ...
+    ],
+    "anvilEvents": [
+        "com.examplemod.ExampleModEventInitializer"
+    ]
+}
+```
+
 ### firing events
 In order to fire an event, invoke `EventInvoker#fire(Event)`:
 ```java
 import transfarmer.anvil.event.EventInvoker;
 
-public class Callers {
+public class EventHooks {
     public static void fireTestEvent() {
         EventInvoker.fire(new TestEvent(true));
     }
 }
 ```
 
-## listening to events
-Classes containing event listeners should be marked with the `@Anvil` annotation:
+### registering listener classes
+Classes containing event listeners should be specified in an entrypoint class that `implements ListenerInitializer`
+and overrides the `get()` method:
 ```java
-import transfarmer.anvil.event.Anvil;
+package com.examplemod;
 
-@Anvil
-public class Listeners {
-    // ...
+import transfarmer.anvil.entrypoint.ListenerInitializer;
+
+public class ExampleModListenerInitializer implements ListenerInitializer {
+    public Collection<Class<?>> get() {
+        return Arrays.asList(Listeners.class);
+    }   
+}
+```
+. Further, the entrypoint class should be specified in your mod JSON file:
+```json
+{
+    "main": [
+        // ...
+    ],
+    "anvilListeners": [
+        "com.examplemod.ExampleModListenerInitializer"
+    ]
 }
 ```
 
-In order to listen to an event, annotate a `public static final` method with the `@Listener` annotation,
-which can optionally receive arguments for priority (between and including 0 and 10; default: 5)
+### defining event listeners
+Event listener methods must be `public static final` and marked with the `@Listener` annotation,
+which can optionally receive arguments for priority (between and including 0 and 100; default: 50)
 and persistence (default: `false`), which indicates that the event listener should receive events
-even with `FAIL` or `SUCCESS` action result.
+even with `FAIL` or `SUCCESS` result. Listener classes are searched for event listeners automatically.
 
 The method must have exactly one parameter: the event that is being listened to:
 ```java
-import transfarmer.anvil.event.EventPriority;
+import transfarmer.anvil.event.Listener;
 
 public class Listeners {
-    @Listener(priority = 7, persist = true)
+    @Listener(priority = 40, persist = true)
     public static void onTest(TestEvent event) {
         if (event.getFlag()) {
             event.setResult(ActionResult.FAIL);
         }
     }
 }
+```
+.

@@ -1,9 +1,9 @@
 {
     "schemaVersion": 1,
     "id": "anvil",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "name": "anvil",
-    "description": "an API that provides events and simple ways of making events and registering event listeners",
+    "description": "a Fabric event API that provides simple and efficient ways of making and using events",
     "authors": [
         "user11681"
     ],
