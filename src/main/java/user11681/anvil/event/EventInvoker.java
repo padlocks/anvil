@@ -10,8 +10,14 @@ import java.util.Map;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import user11681.anvil.Main;
+import user11681.anvil.entrypoint.ClientEventInitializer;
+import user11681.anvil.entrypoint.ClientListenerInitializer;
+import user11681.anvil.entrypoint.CommonEventInitializer;
+import user11681.anvil.entrypoint.CommonListenerInitializer;
 import user11681.anvil.entrypoint.EventInitializer;
 import user11681.anvil.entrypoint.ListenerInitializer;
+import user11681.anvil.entrypoint.ServerEventInitializer;
+import user11681.anvil.entrypoint.ServerListenerInitializer;
 
 import static net.minecraft.util.ActionResult.FAIL;
 import static net.minecraft.util.ActionResult.SUCCESS;
@@ -32,7 +38,16 @@ public class EventInvoker implements PreLaunchEntrypoint {
     }
 
     protected static int registerEvents() {
-        final List<EventInitializer> entrypoints = FabricLoader.getInstance().getEntrypoints("anvilEvents", EventInitializer.class);
+        final FabricLoader loader = FabricLoader.getInstance();
+        final List<EventInitializer> entrypoints = new ArrayList<>(loader.getEntrypoints("anvilCommonEvents", CommonEventInitializer.class));
+
+        switch (loader.getEnvironmentType()) {
+            case CLIENT:
+                entrypoints.addAll(loader.getEntrypoints("anvilClientEvents", ClientEventInitializer.class));
+                break;
+            case SERVER:
+                entrypoints.addAll(loader.getEntrypoints("anvilServerEvents", ServerEventInitializer.class));
+        }
 
         for (final EventInitializer entrypoint : entrypoints) {
             for (final Class<? extends Event> clazz : entrypoint.get()) {
@@ -70,7 +85,15 @@ public class EventInvoker implements PreLaunchEntrypoint {
     }
 
     protected static int registerListeners() {
-        final List<ListenerInitializer> entrypoints = FabricLoader.getInstance().getEntrypoints("anvilListeners", ListenerInitializer.class);
+        final FabricLoader loader = FabricLoader.getInstance();
+        final List<ListenerInitializer> entrypoints = new ArrayList<>(loader.getEntrypoints("anvilCommonListeners", CommonListenerInitializer.class));
+
+        switch (loader.getEnvironmentType()) {
+            case CLIENT:
+                entrypoints.addAll(loader.getEntrypoints("anvilClientListeners", ClientListenerInitializer.class));
+            case SERVER:
+                entrypoints.addAll(loader.getEntrypoints("anvilServerListeners", ServerListenerInitializer.class));
+        }
 
         for (final ListenerInitializer entrypoint : entrypoints) {
             for (final Class<?> clazz : entrypoint.get()) {
