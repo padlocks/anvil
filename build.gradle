@@ -20,8 +20,7 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.apiVersion}"
 
-    implementation "${project.jsr}"
-    include "${project.jsr}"
+    compileOnly "${project.jsr}"
 
     modImplementation "${project.modMenu}"
 }

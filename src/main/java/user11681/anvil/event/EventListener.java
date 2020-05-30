@@ -31,8 +31,9 @@ public class EventListener<E> implements Comparable<EventListener<? extends Even
         return this.priority - other.priority;
     }
 
-    public <F extends Event> void accept(final F event) {
+    public void accept(final Event event) {
         if (this.eventClass.isInstance(event)) {
+            //noinspection unchecked
             this.consumer.accept((E) event);
         }
     }
