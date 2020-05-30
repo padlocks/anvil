@@ -11,7 +11,8 @@ Also see [anvil events](https://github.com/transfarmer/anvilevents).
 
 ##
 ### including anvil with Gradle
-Click the JitPack banner above; replace `implementation` with `modImplementation`.<br>
+Click the JitPack banner above; replace `implementation` with `modImplementation`.
+
 If you want to include this mod as a jar-in-jar dependency, then also add this below `modImplementation`:
 ```groovy
 include "com.github.transfarmer:anvil:${VERSION}"
@@ -77,13 +78,13 @@ and include it in your Fabric JSON file:
 Registering an event causes all of its superclasses except `Object` to be registered if not already registered.
 
 ### firing events
-In order to fire an event, invoke `EventInvoker#fire(Event)`:
+In order to fire an event, invoke `Anvil#fire(Event)`:
 ```java
-import transfarmer.anvil.event.EventInvoker;
+import transfarmer.anvil.Anvil;
 
 public class EventHooks {
     public static void fireTestEvent() {
-        EventInvoker.fire(new TestEvent(true));
+        Anvil.fire(new TestEvent(true));
     }
 }
 ```
@@ -139,6 +140,8 @@ public class Listeners {
     public static void onTest(TestEvent event) {
         if (event.getFlag()) {
             event.setResult(ActionResult.FAIL);
+        } else {
+            event.setSuccess();
         }
     }
 }
