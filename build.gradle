@@ -8,8 +8,6 @@ apply from: "common.gradle"
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-group = project.mavenGroup
-
 minecraft {
 }
 
@@ -22,7 +20,7 @@ dependencies {
 
     compileOnly "${project.jsr}"
 
-    modImplementation "${project.modMenu}"
+    modImplementation "${project.modmenu}"
 }
 
 processResources {

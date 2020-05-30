@@ -1,6 +1,8 @@
 apply plugin: "maven"
 apply from: "project.gradle"
 
+group = "transfarmer"
+
 repositories {
     maven {
         url "https://jitpack.io"
