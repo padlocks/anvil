@@ -57,12 +57,14 @@ public class ExampleModEventInitializer implements EventInitializer {
 and include it in your Fabric JSON file:
 ```json
 {
-    "main": [
-        // ...
-    ],
-    "anvilEvents": [
-        "com.examplemod.ExampleModEventInitializer"
-    ]
+    "entrypoints": {
+        "main": [
+            // ...
+        ],
+        "anvilEvents": [
+            "com.examplemod.ExampleModEventInitializer"
+        ]
+    }
 }
 ```
 
@@ -95,12 +97,14 @@ public class ExampleModListenerInitializer implements ListenerInitializer {
 . Further, the entrypoint class should be specified in your mod JSON file:
 ```json
 {
-    "main": [
-        // ...
-    ],
-    "anvilListeners": [
-        "com.examplemod.ExampleModListenerInitializer"
-    ]
+    "entrypoints": {
+        "main": [
+            // ...
+        ],
+        "anvilListeners": [
+            "com.examplemod.ExampleModListenerInitializer"
+        ]
+    }
 }
 ```
 
