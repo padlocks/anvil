@@ -42,13 +42,19 @@ public class Anvil implements PreLaunchEntrypoint {
         registerEvents();
         long duration = (System.nanoTime() - time) / 1000;
 
-        LOGGER.info("Registered {} event classes ({} abstract and {} implementations) in {} μs.", getTotalEvents(), getAbstractEvents(), getEventImplementations(), duration);
+        final int totalEvents = getTotalEvents();
+        final String implementationString = implementations == 1 ? "implementation": "implementations";
+        final String classString = totalEvents == 1 ? "class" : "classes";
+
+        LOGGER.info("Registered {} event {} ({} abstract and {} {}) in {} μs.", totalEvents, classString, getAbstractEvents(), implementations, implementationString, duration);
 
         time = System.nanoTime();
         registerListeners();
         duration = (System.nanoTime() - time) / 1000;
 
-        LOGGER.info("Registered {} event listeners in {} μs.", getTotalListeners(), duration);
+        final String listenerString = listeners == 1 ? "listener" : "listeners";
+
+        LOGGER.info("Registered {} event {} in {} μs.", listeners, listenerString, duration);
     }
 
     protected static void registerEvents() {
