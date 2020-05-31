@@ -3,12 +3,20 @@ plugins {
     id 'maven-publish'
 }
 
-apply from: "common.gradle"
+apply plugin: "maven"
+apply from: "project.gradle"
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-minecraft {
+group = "user11681"
+
+repositories {
+    mavenLocal()
+
+    maven {
+        url "https://jitpack.io"
+    }
 }
 
 dependencies {
@@ -19,8 +27,10 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.apiVersion}"
 
     compileOnly "${project.jsr}"
+}
 
-    modImplementation "${project.modmenu}"
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 processResources {
