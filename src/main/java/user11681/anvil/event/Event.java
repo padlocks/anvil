@@ -22,8 +22,15 @@ public abstract class Event {
         this.result = PASS;
     }
 
-    public void fire() {
-        Anvil.fire(this);
+    /**
+     * Care should be taken while using this method to not assume an incorrect type.
+     *
+     * @param <T> the desired type to which this event should be cast.
+     * @return this event.
+     */
+    public <T extends Event> T fire() {
+        //noinspection unchecked
+        return (T) Anvil.fire(this);
     }
 
     public ActionResult getResult() {
