@@ -1,6 +1,7 @@
 package user11681.anvil.event;
 
 import net.minecraft.util.ActionResult;
+import user11681.anvil.Anvil;
 
 import static net.minecraft.util.ActionResult.CONSUME;
 import static net.minecraft.util.ActionResult.FAIL;
@@ -19,6 +20,10 @@ public abstract class Event {
 
     public Event() {
         this.result = PASS;
+    }
+
+    public void fire() {
+        Anvil.fire(this);
     }
 
     public ActionResult getResult() {
