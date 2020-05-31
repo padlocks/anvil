@@ -14,7 +14,7 @@ import static net.minecraft.util.ActionResult.SUCCESS;
 public abstract class Event {
     /**
      * {@link ActionResult#SUCCESS} should successfully adopt new behavior and cancel further processing.
-     * {@link ActionResult#FAIL} should cancel further processing and fall back to default behavior.
+     * {@link ActionResult#FAIL} should cancel further processing and return early.
      */
     protected ActionResult result;
 
@@ -23,13 +23,14 @@ public abstract class Event {
     }
 
     /**
-     * Care should be taken while using this method to not assume an incorrect type.
+     * This method is a shortcut for {@link Anvil#fire(Event)}.
+     * Care should be taken to not assume an invalid return type.
      *
      * @param <T> the desired type to which this event should be cast.
      * @return this event.
      */
+    @SuppressWarnings("unchecked")
     public <T extends Event> T fire() {
-        //noinspection unchecked
         return (T) Anvil.fire(this);
     }
 

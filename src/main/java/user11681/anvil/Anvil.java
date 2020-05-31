@@ -182,7 +182,13 @@ public class Anvil implements PreLaunchEntrypoint {
     }
 
     public static <E extends Event> E fire(final E event) {
-        for (final EventListener<? extends Event> listener : EVENTS.get(event.getClass())) {
+        final ListenerList<? extends Event> listeners = EVENTS.get(event.getClass());
+
+        if (listeners == null) {
+            throw new IllegalStateException(String.format("attempted to call an unregistered event %s.", event.getClass().getName()));
+        }
+
+        for (final EventListener<? extends Event> listener : listeners) {
             if (event.shouldContinue() || listener.isPersistent()) {
                 listener.accept(event);
             }
