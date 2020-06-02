@@ -82,14 +82,13 @@ public class Anvil implements PreLaunchEntrypoint {
             final Class<T> superclass = (Class<T>) clazz.getSuperclass();
 
             registerBranch(superclass);
-            registerSuperevents(clazz, superclass);
+            SUBEVENTS.get(superclass).add(clazz);
         }
 
         if (!SUBEVENTS.containsKey(clazz)) {
             final Set<Class<? extends Event>> subevents = new HashSet<>();
 
             subevents.add(clazz);
-
             SUBEVENTS.put(clazz, subevents);
 
             if (!Modifier.isAbstract(clazz.getModifiers())) {
@@ -99,14 +98,6 @@ public class Anvil implements PreLaunchEntrypoint {
 
         if (!EVENTS.containsKey(clazz)) {
             EVENTS.put(clazz, new ListenerList<>());
-        }
-    }
-
-    protected static <T extends Event> void registerSuperevents(final Class<T> clazz, final Class<? super T> superclass) {
-        if (Event.class.isAssignableFrom(superclass)) {
-            SUBEVENTS.get(superclass).add(clazz);
-
-            registerSuperevents(clazz, superclass.getSuperclass());
         }
     }
 
@@ -159,7 +150,7 @@ public class Anvil implements PreLaunchEntrypoint {
                 try {
                     method.invoke(null, event);
                 } catch (final InvocationTargetException | IllegalAccessException exception) {
-                    LOGGER.error("An error occurred while attempting to fire an event: ", exception.getCause());
+                    LOGGER.error(String.format("An error occurred while attempting to fire %s: ", eventClass.getName()), exception.getCause());
                 }
             }, priority, annotation.persist());
         }
