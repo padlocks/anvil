@@ -33,28 +33,29 @@ public class Anvil implements PreLaunchEntrypoint {
 
     protected static final Map<Class<? extends Event>, ListenerList<? extends Event>> EVENTS = new HashMap<>();
     protected static final Map<Class<? extends Event>, Set<Class<? extends Event>>> SUBEVENTS = new HashMap<>();
+    protected static int abstractEvents;
     protected static int implementations;
+    protected static int totalEvents;
     protected static int listeners;
 
     @Override
     public void onPreLaunch() {
-        long time = System.nanoTime();
-        registerEvents();
-        long duration = (System.nanoTime() - time) / 1000;
+        final long eventDuration = time(Anvil::registerEvents);
+        final long listenerDuration = time(Anvil::registerListeners);
 
-        final int totalEvents = getTotalEvents();
         final String implementationString = implementations == 1 ? "implementation": "implementations";
         final String classString = totalEvents == 1 ? "class" : "classes";
-
-        LOGGER.info("Registered {} event {} ({} abstract and {} {}) in {} μs.", totalEvents, classString, getAbstractEvents(), implementations, implementationString, duration);
-
-        time = System.nanoTime();
-        registerListeners();
-        duration = (System.nanoTime() - time) / 1000;
-
         final String listenerString = listeners == 1 ? "listener" : "listeners";
 
-        LOGGER.info("Registered {} event {} in {} μs.", listeners, listenerString, duration);
+        LOGGER.info("Registered {} event {} ({} abstract and {} {}) in {} μs.", totalEvents, classString, abstractEvents, implementations, implementationString, eventDuration);
+        LOGGER.info("Registered {} event {} in {} μs.", listeners, listenerString, listenerDuration);
+    }
+
+    protected long time(final Runnable runnable) {
+        final long start = System.nanoTime();
+        runnable.run();
+
+        return (System.nanoTime() - start) / 1000;
     }
 
     protected static void registerEvents() {
@@ -91,9 +92,13 @@ public class Anvil implements PreLaunchEntrypoint {
             subevents.add(clazz);
             SUBEVENTS.put(clazz, subevents);
 
-            if (!Modifier.isAbstract(clazz.getModifiers())) {
+            if (Modifier.isAbstract(clazz.getModifiers())) {
+                ++abstractEvents;
+            } else {
                 ++implementations;
             }
+
+            ++totalEvents;
         }
 
         if (!EVENTS.containsKey(clazz)) {
@@ -157,7 +162,7 @@ public class Anvil implements PreLaunchEntrypoint {
     }
 
     public static int getAbstractEvents() {
-        return getTotalEvents() - getEventImplementations();
+        return abstractEvents;
     }
 
     public static int getEventImplementations() {
@@ -165,7 +170,7 @@ public class Anvil implements PreLaunchEntrypoint {
     }
 
     public static int getTotalEvents() {
-        return EVENTS.size();
+        return totalEvents;
     }
 
     public static int getTotalListeners() {
