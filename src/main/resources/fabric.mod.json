@@ -16,9 +16,6 @@
     "entrypoints": {
         "preLaunch": [
             "user11681.anvil.Anvil"
-        ],
-        "anvilCommonListeners": [
-            "user11681.anvil.Listeners"
         ]
     },
     "mixins": [
