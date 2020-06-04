@@ -3,7 +3,7 @@ package user11681.anvil.event;
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
-public class EventListener<E> implements Comparable<EventListener<? extends Event>> {
+public class EventListener<E> implements Comparable<EventListener<?>> {
     protected final Class<E> eventClass;
     protected final Consumer<E> consumer;
     protected final int priority;
@@ -27,11 +27,11 @@ public class EventListener<E> implements Comparable<EventListener<? extends Even
     }
 
     @Override
-    public int compareTo(@Nonnull final EventListener<? extends Event> other) {
+    public int compareTo(@Nonnull final EventListener<?> other) {
         return this.priority - other.priority;
     }
 
-    public void accept(final Event event) {
+    public void accept(final AnvilEvent event) {
         if (this.eventClass.isInstance(event)) {
             //noinspection unchecked
             this.consumer.accept((E) event);

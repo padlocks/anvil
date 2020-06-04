@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "compatibilityLevel": "JAVA_8",
+    "package": "user11681.anvil.mixin.mixin",
+    "mixins": [
+        "ArrayBackedEventMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

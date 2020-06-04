@@ -11,26 +11,26 @@ import static net.minecraft.util.ActionResult.SUCCESS;
 /**
  * the base class used for events.
  */
-public abstract class Event {
+public abstract class AnvilEvent {
     /**
      * {@link ActionResult#SUCCESS} should successfully adopt new behavior and cancel further processing.
      * {@link ActionResult#FAIL} should cancel further processing and return early.
      */
     protected ActionResult result;
 
-    public Event() {
+    public AnvilEvent() {
         this.result = PASS;
     }
 
     /**
-     * This method is a shortcut for {@link Anvil#fire(Event)}.
+     * This method is a shortcut for {@link Anvil#fire(AnvilEvent)}.
      * Care should be taken to not assume an invalid return type.
      *
      * @param <T> the desired type to which this event should be cast.
      * @return this event.
      */
     @SuppressWarnings("unchecked")
-    public <T extends Event> T fire() {
+    public <T extends AnvilEvent> T fire() {
         return (T) Anvil.fire(this);
     }
 

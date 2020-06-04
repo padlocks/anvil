@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ListenerList<E extends Event> implements Iterable<EventListener<E>> {
+public class ListenerList<E> implements Iterable<EventListener<E>> {
     protected final List<EventListener<E>> delegate;
 
     public ListenerList() {
@@ -20,7 +20,7 @@ public class ListenerList<E extends Event> implements Iterable<EventListener<E>>
         int index = size;
 
         for (int i = 0; i < size; i++) {
-            final EventListener<? extends Event> other = delegate.get(i);
+            final EventListener<E> other = delegate.get(i);
 
             if (other.equals(listener)) {
                 final int comparison = listener.compareTo(other);
@@ -37,13 +37,13 @@ public class ListenerList<E extends Event> implements Iterable<EventListener<E>>
         delegate.add(index, listener);
     }
 
+    public int size() {
+        return this.delegate.size();
+    }
+
     @Override
     @Nonnull
     public Iterator<EventListener<E>> iterator() {
         return this.delegate.iterator();
-    }
-
-    public int size() {
-        return this.delegate.size();
     }
 }

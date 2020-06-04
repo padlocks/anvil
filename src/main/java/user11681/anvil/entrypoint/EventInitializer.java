@@ -1,12 +1,12 @@
 package user11681.anvil.entrypoint;
 
 import java.util.Collection;
-import user11681.anvil.event.Event;
+import user11681.anvil.event.AnvilEvent;
 
 public interface EventInitializer {
     /**
-     * @return the implementations of {@link Event} to be registered.
+     * @return the implementations of {@link AnvilEvent} to be registered.
      * Superclasses are registered automatically.
      */
-    Collection<Class<? extends Event>> get();
+    Collection<Class<? extends AnvilEvent>> get();
 }
