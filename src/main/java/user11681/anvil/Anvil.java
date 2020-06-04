@@ -39,7 +39,7 @@ public class Anvil implements PreLaunchEntrypoint {
     protected static final Map<Class<?>, Set<Class<?>>> SUBEVENTS = new HashMap<>();
     protected static final Set<Event<?>> FABRIC_EVENTS = new HashSet<>();
 
-    protected static boolean fabricExists = true;
+    protected static boolean fabricSupport = true;
     protected static int abstractEvents;
     protected static int implementations;
     protected static int anvilEvents;
@@ -185,7 +185,7 @@ public class Anvil implements PreLaunchEntrypoint {
                     }
                 }
             }
-        } else if (fabricExists) {
+        } else if (fabricSupport) {
             if (annotation.priority() != Listener.DEFAULT_PRIORITY) {
                 throw new IllegalArgumentException("anvil does not support non-anvil event priorities.");
             } else if (annotation.persist()) {
@@ -217,7 +217,7 @@ public class Anvil implements PreLaunchEntrypoint {
                     LOGGER.error("illegal access? Impossible.", exception);
                 } catch (final ClassNotFoundException exception) {
                     LOGGER.error(String.format("unable to class find %s.", className), exception);
-                    fabricExists = false;
+                    fabricSupport = false;
                 }
             }
         }
