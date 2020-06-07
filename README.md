@@ -2,14 +2,14 @@
 
 # anvil
 
-[![](https://jitpack.io/v/transfarmer/anvil.svg)](https://jitpack.io/#transfarmer/anvil)
+[![](https://jitpack.io/v/user11681/anvil.svg)](https://jitpack.io/#user11681/anvil)
 
 an event system for Fabric that features simple creation of events and registration of event listeners
 and supports changing method context and modification of event behavior via `ActionResult`s.
 
 anvil supports Fabric API events.
 
-Also see [anvil events](https://github.com/transfarmer/anvilevents).
+Also see [anvil events](https://github.com/user11681/anvilevents).
 
 ##
 ### including anvil with Gradle
@@ -17,7 +17,7 @@ Click the JitPack banner above; replace `implementation` with `modImplementation
 
 If you want to include this mod as a jar-in-jar dependency, then also add this below `modImplementation`:
 ```groovy
-include "com.github.transfarmer:anvil:${VERSION}"
+include "com.github.user11681:anvil:${VERSION}"
 ```
 , where `${VERSION}` is your chosen version from above. Use `1.15.2-SNAPSHOT` for the latest commit.
 
@@ -25,7 +25,7 @@ include "com.github.transfarmer:anvil:${VERSION}"
 ### event definition
 In order to define an event, extend the `Event` class:
 ```java
-import transfarmer.anvil.event.Event;
+import user11681.anvil.event.Event;
 
 public class TestEvent extends Event {
     protected boolean flag;
@@ -51,7 +51,7 @@ and overrides `get()`, which should return a `Collection` of the classes of the 
 ```java
 package com.examplemod.event;
 
-import transfarmer.anvil.entrypoint.CommonEventInitializer;
+import user11681.anvil.entrypoint.CommonEventInitializer;
 
 public class ExampleModEventInitializer implements CommonEventInitializer {
     public Collection<Class<? extends Event>> get() {
@@ -83,7 +83,7 @@ Registering an event causes all of its superclasses except `Object` to be regist
 ### firing events
 In order to fire an event, invoke `Anvil#fire(Event)`:
 ```java
-import transfarmer.anvil.Anvil;
+import user11681.anvil.Anvil;
 
 public class EventHooks {
     public static void fireTestEvent() {
@@ -100,7 +100,7 @@ and overrides the `get()` method, which should return the listener classes to be
 ```java
 package com.examplemod.event;
 
-import transfarmer.anvil.entrypoint.CommonListenerInitializer;
+import user11681.anvil.entrypoint.CommonListenerInitializer;
 
 public class ExampleModListenerInitializer implements CommonListenerInitializer {
     public Collection<Class<?>> get() {
@@ -137,7 +137,7 @@ even with `FAIL` or `SUCCESS` result. Listener classes are searched for event li
 
 The method must have exactly one parameter: the event that is being listened to:
 ```java
-import transfarmer.anvil.event.Listener;
+import user11681.anvil.event.Listener;
 
 public class Listeners {
     @Listener(priority = 40, persist = true)

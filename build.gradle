@@ -20,11 +20,11 @@ repositories {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraftVersion}"
-    mappings "net.fabricmc:yarn:${project.yarnMappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loaderVersion}"
+    minecraft "${project.minecraft}"
+    mappings "${project.yarn}"
+    modImplementation "${project.loader}"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.apiVersion}"
+    modImplementation "${project.api}"
 
     compileOnly "${project.jsr}"
 }
