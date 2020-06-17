@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/user11681/anvil/1.15.2/src/main/resources/assets/anvil/icon.png" width="20%"></img>
+<img src="https://raw.githubusercontent.com/user11681/anvil/1.16/src/main/resources/assets/anvil/icon.png" width="20%"></img>
 
 # anvil
 
@@ -7,7 +7,7 @@
 an event system for Fabric that features simple creation of events and registration of event listeners
 and supports changing method context and modification of event behavior via `ActionResult`s.
 
-anvil supports Fabric API events.
+Anvil supports Fabric API events.
 
 Also see [anvil events](https://github.com/user11681/anvilevents).
 
@@ -23,11 +23,9 @@ include "com.github.user11681:anvil:${VERSION}"
 
 ## making events
 ### event definition
-In order to define an event, extend the `Event` class:
+In order to define an event, extend the `AnvilEvent` class:
 ```java
-import user11681.anvil.event.Event;
-
-public class TestEvent extends Event {
+public class TestEvent extends AnvilEvent {
     protected boolean flag;
     
     public TestEvent(boolean flag) {
@@ -46,15 +44,10 @@ public class TestEvent extends Event {
 
 ### event registration
 To register an event, define an entrypoint class that implements one of 
-`CommonEventInitializer`, `ClientEventInitializer` and `ServerEventInitializer`
-and overrides `get()`, which should return a `Collection` of the classes of the events to be registered:
+`CommonEventInitializer`, `ClientEventInitializer` and `ServerEventInitializer`:
 ```java
-package com.examplemod.event;
-
-import user11681.anvil.entrypoint.CommonEventInitializer;
-
 public class ExampleModEventInitializer implements CommonEventInitializer {
-    public Collection<Class<? extends Event>> get() {
+    public Collection<Class<? extends AnvilEvent>> get() {
         return Arrays.asList(TestEvent.class);
     }   
 }
@@ -78,16 +71,16 @@ and include it in your Fabric JSON file:
     }
 }
 ```
-Registering an event causes all of its superclasses except `Object` to be registered if not already registered.
+Registering an event causes all of its superclasses up to `AnvilEvent` to be registered if not already registered.
 
 ### firing events
-In order to fire an event, invoke `Anvil#fire(Event)`:
+In order to fire an event, invoke `Anvil#fire(Event)` or `AnvilEvent#fire()`:
 ```java
-import user11681.anvil.Anvil;
-
 public class EventHooks {
     public static void fireTestEvent() {
         Anvil.fire(new TestEvent(true));
+        // or
+        // new TestEvent(true).fire();
     }
 }
 ```
@@ -95,20 +88,15 @@ public class EventHooks {
 ## listening to events
 ### registering listener classes
 Classes containing event listener methods should be specified in an entrypoint class that implements one of
-`CommonListenerInitializer`, `ClientListenerInitializer` and `ServerListenerInitializer`
-and overrides the `get()` method, which should return the listener classes to be registered:
+`CommonListenerInitializer`, `ClientListenerInitializer` and `ServerListenerInitializer`:
 ```java
-package com.examplemod.event;
-
-import user11681.anvil.entrypoint.CommonListenerInitializer;
-
 public class ExampleModListenerInitializer implements CommonListenerInitializer {
     public Collection<Class<?>> get() {
         return Arrays.asList(Listeners.class);
     }   
 }
 ```
-. Further, the entrypoint should be specified in your mod JSON file:
+. Further, the entrypoint should be specified in your Fabric JSON file:
 ```json
 {
     "entrypoints": {
@@ -116,7 +104,7 @@ public class ExampleModListenerInitializer implements CommonListenerInitializer 
             ". . ."
         ],
         "anvilCommonListeners": [
-            "com.examplemod.ExampleModListenerInitializer"
+            "io.github.examplemod.ExampleModListenerInitializer"
         ],
         "anvilClientListeners": [
             ". . ."
@@ -137,8 +125,6 @@ even with `FAIL` or `SUCCESS` result. Listener classes are searched for event li
 
 The method must have exactly one parameter: the event that is being listened to:
 ```java
-import user11681.anvil.event.Listener;
-
 public class Listeners {
     @Listener(priority = 40, persist = true)
     public static void onTest(TestEvent event) {
@@ -158,7 +144,7 @@ To listen to a Fabric event, make a `public static` method marked with the `@Lis
 The annotation may not take parameters except the default values because anvil currently does not support
 non-anvil event priorities and persistence.
 
-anvil registers Fabric events automatically.
+Anvil registers Fabric events automatically.
 ```java
 public class Listeners {
     @Listener
