@@ -30,28 +30,27 @@ import user11681.anvil.event.Listener;
 import user11681.anvil.event.ListenerList;
 import user11681.anvil.mixin.duck.ArrayBackedEventDuck;
 
-public class Anvil implements PreLaunchEntrypoint {
-    public static final String MOD_ID = "anvil";
+public final class Anvil implements PreLaunchEntrypoint {
+    private static final Logger LOGGER = LogManager.getLogger("anvil");
 
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    private static final Map<Class<?>, ListenerList<? extends AnvilEvent>> EVENTS = new HashMap<>();
+    private static final Map<Class<?>, Set<Class<?>>> SUBEVENTS = new HashMap<>();
+    private static final Set<Event<?>> FABRIC_EVENTS = new HashSet<>();
 
-    protected static final Map<Class<?>, ListenerList<? extends AnvilEvent>> EVENTS = new HashMap<>();
-    protected static final Map<Class<?>, Set<Class<?>>> SUBEVENTS = new HashMap<>();
-    protected static final Set<Event<?>> FABRIC_EVENTS = new HashSet<>();
+    private static boolean fabricSupport = true;
 
-    protected static boolean fabricSupport = true;
-    protected static int abstractEvents;
-    protected static int implementations;
-    protected static int anvilEvents;
-    protected static int listenedAnvilEvents;
-    protected static int fabricEvents;
-    protected static int totalEvents;
-    protected static int anvilListeners;
-    protected static int fabricListeners;
-    protected static int totalListeners;
+    private static int abstractEvents;
+    private static int implementations;
+    private static int anvilEvents;
+    private static int listenedAnvilEvents;
+    private static int fabricEvents;
+    private static int totalEvents;
+    private static int anvilListeners;
+    private static int fabricListeners;
+    private static int totalListeners;
 
     @Override
-    public void onPreLaunch() {
+    public final void onPreLaunch() {
         final long eventDuration = time(Anvil::registerEvents);
         final long listenerDuration = time(Anvil::registerListeners);
 
@@ -68,14 +67,15 @@ public class Anvil implements PreLaunchEntrypoint {
         LOGGER.info("Registration finished after {} μs. {} {} registered.", eventDuration + listenerDuration, totalEvents, totalEventString);
     }
 
-    protected long time(final Runnable runnable) {
+    private long time(final Runnable runnable) {
         final long start = System.nanoTime();
+
         runnable.run();
 
         return (System.nanoTime() - start) / 1000;
     }
 
-    protected static void registerEvents() {
+    private static void registerEvents() {
         final FabricLoader loader = FabricLoader.getInstance();
         final List<EventInitializer> entrypoints = new ArrayList<>(loader.getEntrypoints("anvilCommonEvents", CommonEventInitializer.class));
 
@@ -89,27 +89,28 @@ public class Anvil implements PreLaunchEntrypoint {
 
         for (final EventInitializer entrypoint : entrypoints) {
             for (final Class<? extends AnvilEvent> clazz : entrypoint.get()) {
-                registerBranch(clazz);
+                registerBranch(clazz, clazz);
             }
         }
     }
 
-    protected static <T extends AnvilEvent> void registerBranch(final Class<T> clazz) {
-        if (AnvilEvent.class.isAssignableFrom(clazz.getSuperclass())) {
+    private static <T extends AnvilEvent, U extends AnvilEvent> void registerBranch(final Class<U> child, final Class<T> parent) {
+        if (AnvilEvent.class.isAssignableFrom(parent.getSuperclass())) {
             //noinspection unchecked
-            final Class<T> superclass = (Class<T>) clazz.getSuperclass();
+            final Class<T> superclass = (Class<T>) parent.getSuperclass();
 
-            registerBranch(superclass);
-            SUBEVENTS.get(superclass).add(clazz);
+            registerBranch(child, superclass);
         }
 
-        if (!SUBEVENTS.containsKey(clazz)) {
-            final Set<Class<?>> subevents = new HashSet<>();
+        final Set<Class<?>> subevents;
 
-            subevents.add(clazz);
-            SUBEVENTS.put(clazz, subevents);
+        if (!SUBEVENTS.containsKey(parent)) {
+            subevents = new HashSet<>();
 
-            if (Modifier.isAbstract(clazz.getModifiers())) {
+            subevents.add(parent);
+            SUBEVENTS.put(parent, subevents);
+
+            if (Modifier.isAbstract(parent.getModifiers())) {
                 ++abstractEvents;
             } else {
                 ++implementations;
@@ -117,14 +118,18 @@ public class Anvil implements PreLaunchEntrypoint {
 
             ++anvilEvents;
             ++totalEvents;
+        } else {
+            subevents = SUBEVENTS.get(parent);
         }
 
-        if (!EVENTS.containsKey(clazz)) {
-            EVENTS.put(clazz, new ListenerList<>());
+        subevents.add(child);
+
+        if (!EVENTS.containsKey(parent)) {
+            EVENTS.put(parent, new ListenerList<>());
         }
     }
 
-    protected static void registerListeners() {
+    private static void registerListeners() {
         final FabricLoader loader = FabricLoader.getInstance();
         final List<ListenerInitializer> entrypoints = new ArrayList<>(loader.getEntrypoints("anvilCommonListeners", CommonListenerInitializer.class));
 
@@ -144,7 +149,7 @@ public class Anvil implements PreLaunchEntrypoint {
                     if (annotation != null) {
                         final int modifiers = method.getModifiers();
 
-                        if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers)) {
+                        if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && method.getParameterCount() > 0) {
                             registerListener(method.getParameterTypes()[0], method, annotation);
                             ++totalListeners;
                         }
@@ -154,10 +159,10 @@ public class Anvil implements PreLaunchEntrypoint {
         }
     }
 
-    protected static <E, T> void registerListener(final Class<?> eventClass, final Method method, final Listener annotation) {
+    private static <E, T> void registerListener(final Class<?> eventClass, final Method method, final Listener annotation) {
         if (AnvilEvent.class.isAssignableFrom(eventClass)) {
             if (method.getReturnType() == void.class && method.getParameterCount() == 1) {
-                for (final Class<?> subeventClass : SUBEVENTS.get(eventClass)) {
+                for (final Class<?> eventSubclass : SUBEVENTS.get(eventClass)) {
                     final int priority = annotation.priority();
 
                     if (priority < 0) {
@@ -167,23 +172,23 @@ public class Anvil implements PreLaunchEntrypoint {
                     }
 
                     //noinspection unchecked
-                    final ListenerList<E> listeners = (ListenerList<E>) EVENTS.get(subeventClass);
+                    final ListenerList<E> listeners = (ListenerList<E>) EVENTS.get(eventSubclass);
 
                     //noinspection unchecked
-                    listeners.add((Class<E>) subeventClass, (final E event) -> {
+                    listeners.add((Class<E>) eventSubclass, (final E event) -> {
                         try {
                             method.invoke(null, event);
                         } catch (final InvocationTargetException | IllegalAccessException exception) {
-                            LOGGER.error(String.format("An error occurred while attempting to fire %s: ", subeventClass.getName()), exception.getCause());
+                            LOGGER.error(String.format("An error occurred while attempting to fire %s.", eventSubclass.getName()), exception.getCause());
                         }
                     }, priority, annotation.persist());
 
-                    ++anvilListeners;
-
-                    if (listeners.size() == 1) {
+                    if (listeners.size() == 1 && !Modifier.isAbstract(eventSubclass.getModifiers())) {
                         ++listenedAnvilEvents;
                     }
                 }
+
+                ++anvilListeners;
             }
         } else if (fabricSupport) {
             if (annotation.priority() != Listener.DEFAULT_PRIORITY) {
@@ -196,11 +201,9 @@ public class Anvil implements PreLaunchEntrypoint {
                 final String className = "net.fabricmc.fabric.impl.base.event.ArrayBackedEvent";
 
                 try {
-                    final boolean accessible = field.isAccessible();
                     field.setAccessible(true);
                     //noinspection unchecked
                     final Event<T> event = (Event<T>) field.get(null);
-                    field.setAccessible(accessible);
 
                     if (Class.forName(className).isInstance(event)) {
                         //noinspection unchecked
@@ -216,7 +219,7 @@ public class Anvil implements PreLaunchEntrypoint {
                 } catch (final IllegalAccessException exception) {
                     LOGGER.error("illegal access? Impossible.", exception);
                 } catch (final ClassNotFoundException exception) {
-                    LOGGER.error(String.format("unable to class find %s.", className), exception);
+                    LOGGER.error(String.format("unable to class find %s. Abort support for Fabric API events.", className), exception);
                     fabricSupport = false;
                 }
             }
@@ -247,7 +250,7 @@ public class Anvil implements PreLaunchEntrypoint {
         return anvilListeners;
     }
 
-    public static int getFabricListenerS() {
+    public static int getFabricListeners() {
         return fabricListeners;
     }
 

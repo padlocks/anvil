@@ -13,10 +13,15 @@ import static net.minecraft.util.ActionResult.SUCCESS;
  */
 public abstract class AnvilEvent {
     /**
-     * {@link ActionResult#SUCCESS} should successfully adopt new behavior and cancel further processing.
-     * {@link ActionResult#FAIL} should cancel further processing and return early.
+     * {@link ActionResult#SUCCESS} indicates that the given values should be accepted and that further processing
+     * should be canceled.
+     * <br>
+     * {@link ActionResult#PASS} indicates that the event should be passed to other listeners for further processing.
+     * <br>
+     * {@link ActionResult#FAIL} indicates that further processing should be canceled and that fallback behavior should
+     * be used.
      */
-    protected ActionResult result;
+    public ActionResult result;
 
     public AnvilEvent() {
         this.result = PASS;
@@ -32,10 +37,6 @@ public abstract class AnvilEvent {
     @SuppressWarnings("unchecked")
     public <T extends AnvilEvent> T fire() {
         return (T) Anvil.fire(this);
-    }
-
-    public ActionResult getResult() {
-        return this.result;
     }
 
     public void setAccepted() {
@@ -82,9 +83,5 @@ public abstract class AnvilEvent {
 
     public void setSuccess() {
         this.result = SUCCESS;
-    }
-
-    public void setResult(final ActionResult result) {
-        this.result = result;
     }
 }
