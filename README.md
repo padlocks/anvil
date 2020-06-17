@@ -19,7 +19,7 @@ If you want to include this mod as a jar-in-jar dependency, then also add this b
 ```groovy
 include "com.github.user11681:anvil:${VERSION}"
 ```
-, where `${VERSION}` is your chosen version from above. Use `1.15.2-SNAPSHOT` for the latest commit.
+, where `${VERSION}` is your chosen version from above. Use `1.16-SNAPSHOT` for the latest commit.
 
 ## making events
 ### event definition
