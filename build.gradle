@@ -17,6 +17,23 @@ repositories {
     maven {
         url "https://jitpack.io"
     }
+
+    maven {
+        url "https://maven.jamieswhiteshirt.com/libs-release"
+    }
+
+    maven {
+        name "Cotton"
+        url "https://server.bbkr.space/artifactory/libs-release"
+    }
+
+    maven {
+        url "https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master"
+    }
+
+    maven {
+        url "https://repository.ow2.org/nexus/content/repositories/snapshots"
+    }
 }
 
 dependencies {
@@ -24,10 +41,12 @@ dependencies {
     mappings "${project.yarn}"
     modImplementation "${project.loader}"
 
-    modImplementation "${project.api}"
-
+    compileOnly "${project.jetbrainsAnnotations}"
     compileOnly "${project.jsr}"
+
+//    modImplementation "com.jamieswhiteshirt:developer-mode:1.0.15"
 }
+
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
@@ -82,6 +101,6 @@ publishing {
     // select the repositories you want to publish to
     repositories {
         // uncomment to publish to the local maven
-         mavenLocal()
+        mavenLocal()
     }
 }

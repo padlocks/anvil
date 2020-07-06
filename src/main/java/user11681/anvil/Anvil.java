@@ -197,7 +197,7 @@ public final class Anvil implements PreLaunchEntrypoint {
                 throw new IllegalArgumentException("anvil cannot send canceled events to non-anvil events.");
             }
 
-            for (final Field field : eventClass.getDeclaredFields()) {
+            for (final Field field : eventClass.getFields()) {
                 final String className = "net.fabricmc.fabric.impl.base.event.ArrayBackedEvent";
 
                 try {
@@ -217,9 +217,9 @@ public final class Anvil implements PreLaunchEntrypoint {
 
                     ++fabricListeners;
                 } catch (final IllegalAccessException exception) {
-                    LOGGER.error("illegal access? Impossible.", exception);
+                    LOGGER.error("illegal access? Muri da.", exception);
                 } catch (final ClassNotFoundException exception) {
-                    LOGGER.error(String.format("unable to class find %s. Abort support for Fabric API events.", className), exception);
+                    LOGGER.error(String.format("unable to class find %s; abort support for Fabric API events.", className), exception);
                     fabricSupport = false;
                 }
             }

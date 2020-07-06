@@ -1,8 +1,8 @@
-archivesBaseName = "anvil"
 version = "0.7.0"
 
 dependencies {
-    modImplementation "${project.modmenu}"
+    modApi "${project.apiBase}"
+    include "${project.apiBase}"
 
-    modImplementation "${project.anvilevents}"
+    modImplementation "${project.anvilEvents}"
 }
